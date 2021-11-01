@@ -1,7 +1,8 @@
 class RecipeCard extends HTMLElement {
   constructor() {
     // Part 1 Expose - TODO
-
+    super();
+    const shadow = this.attachShadow({ mode: "open" });
     // You'll want to attach the shadow DOM here
   }
 
@@ -87,7 +88,7 @@ class RecipeCard extends HTMLElement {
 
     // Here's the root element that you'll want to attach all of your other elements to
     const card = document.createElement('article');
-
+    
     // Some functions that will be helpful here:
     //    document.createElement()
     //    document.querySelector()
@@ -100,6 +101,63 @@ class RecipeCard extends HTMLElement {
     // created in the constructor()
 
     // Part 1 Expose - TODO
+    this.shadowRoot.appendChild(card);
+    this.shadowRoot.appendChild(styleElem);
+    let image=document.createElement('img');
+    image.src=searchForKey(data,'thumbnailUrl');
+    if(searchForKey(data,'thumbnailUrl')==null)
+    image.src=searchForKey(data,'url')
+    card.appendChild(image);
+
+    let title=document.createElement('p');
+    title.className='title';
+    let a_para=document.createElement('a');
+    a_para.href=getUrl(data);
+    a_para.innerText=searchForKey(data,"headline");
+    title.appendChild(a_para);
+    card.appendChild(title)
+
+    let org=document.createElement('p');
+    org.className='organization';
+    org.innerText=getOrganization(data);
+    if(getOrganization(data)==null){
+      org.innerText=searchForKey(data,'author').at(0).name;
+    }
+    card.appendChild(org);
+
+    let rating=document.createElement('div');
+    rating.className='rating';
+    let rating_ave=document.createElement('span');
+    let im=document.createElement('img');
+    let number=document.createElement('span')
+    let recipe_rate=searchForKey(data,"ratingValue")
+    if(recipe_rate){
+      rating_ave.innerText=Math.round(recipe_rate);
+      rating.appendChild(rating_ave);
+      im.src="assets/images/icons/" + Math.round(recipe_rate) + "-star.svg";
+      im.alt=Math.round(recipe_rate) + " stars";
+      rating.appendChild(im)
+      number.innerText="("+searchForKey(data,'ratingCount')+")";
+      rating.appendChild(number);
+    }
+    else{
+      rating_ave.innerText='No Review';
+      rating.appendChild(rating_ave);
+    }
+    card.appendChild(rating);
+
+    if(searchForKey(data,'totalTime')!=null){
+    let time=document.createElement('time')
+    time.innerText=convertTime(searchForKey(data,'totalTime'));
+    card.append(time);
+    }
+
+
+
+    let ing=document.createElement('p');
+    ing.className='ingredients';
+    ing.innerText=createIngredientList(searchForKey(data,'recipeIngredient'));
+    card.append(ing);
   }
 }
 
